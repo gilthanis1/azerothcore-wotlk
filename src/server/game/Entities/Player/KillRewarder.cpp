@@ -223,12 +223,7 @@ void KillRewarder::_RewardPlayer(Player* player, bool isDungeon)
     // Give reputation and kill credit only in PvE.
     if (!_isPvP || _isBattleGround)
     {
-        // CUSTOM (James): full solo kill XP in the open world only; normal group split in dungeons/raids.
-        // Original line:
-        // float xpRate = _group ? _groupRate * float(_GetPlayerLevel(player)) / _aliveSumLevel : /*Personal rate is 100%.*/ 1.0f; // Group rate depends on the sum of levels.
-        float xpRate = isDungeon
-            ? (_group ? _groupRate * float(_GetPlayerLevel(player)) / _aliveSumLevel : 1.0f) // original behavior
-            : 1.0f;
+        float xpRate = _group ? _groupRate * float(_GetPlayerLevel(player)) / _aliveSumLevel : /*Personal rate is 100%.*/ 1.0f; // Group rate depends on the sum of levels.
         sScriptMgr->OnPlayerRewardKillRewarder(player, this, isDungeon, xpRate);                                                // Personal rate is 100%.
 
         if (_xp)
