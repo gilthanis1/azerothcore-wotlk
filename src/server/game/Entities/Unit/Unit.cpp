@@ -3247,9 +3247,11 @@ float Unit::CalculateLevelPenalty(SpellInfo const* spellProto) const
 
     float LvlPenalty = 0.0f;
 
-    // xinef: added brackets
-    if (spellProto->SpellLevel < 20)
-        LvlPenalty = (20.0f - spellProto->SpellLevel) * 3.75f;
+    // CUSTOM (James): removed the under-20 spell power penalty (rank 1 spells used to keep only ~29% of spell power).
+    // The downranking penalty (LvlFactor below) is kept. Original code:
+    // // xinef: added brackets
+    // if (spellProto->SpellLevel < 20)
+    //     LvlPenalty = (20.0f - spellProto->SpellLevel) * 3.75f;
 
     float LvlFactor = (float(spellProto->SpellLevel) + 6.0f) / float(GetLevel());
     if (LvlFactor > 1.0f)

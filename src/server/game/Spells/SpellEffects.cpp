@@ -5721,24 +5721,10 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
                 unitCaster->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, pGameObj->GetGUID());
                 unitCaster->AddGameObject(pGameObj);              // will removed at spell cancel
 
-                // end time of range when possible catch fish (FISHING_BOBBER_READY_TIME..GetDuration(m_spellInfo))
-                // start time == fish-FISHING_BOBBER_READY_TIME (0..GetDuration(m_spellInfo)-FISHING_BOBBER_READY_TIME)
-                int32 lastSec = 0;
-                switch (urand(0, 2))
-                {
-                    case 0:
-                        lastSec =  3;
-                        break;
-                    case 1:
-                        lastSec =  7;
-                        break;
-                    case 2:
-                        lastSec = 13;
-                        break;
-                }
-
-                // Duration of the fishing bobber can't be higher than the Fishing channeling duration
-                duration = std::min(duration, duration - lastSec*IN_MILLISECONDS + FISHING_BOBBER_READY_TIME*IN_MILLISECONDS);
+                // CUSTOM (James): instant bite - the bobber splashes as soon as it lands.
+                // Stock code picked a random 3/7/13 sec wait; this keeps only the
+                // FISHING_BOBBER_READY_TIME window (5 sec) to click the bobber.
+                duration = std::min(duration, int32(FISHING_BOBBER_READY_TIME * IN_MILLISECONDS));
 
                 break;
             }

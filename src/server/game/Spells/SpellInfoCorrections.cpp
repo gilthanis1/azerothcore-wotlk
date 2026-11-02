@@ -5435,6 +5435,23 @@ void SpellMgr::LoadSpellInfoCorrections()
     LockEntry* key = const_cast<LockEntry*>(sLockStore.LookupEntry(36)); // 3366 Opening, allows to open without proper key
     key->Type[2] = LOCK_KEY_NONE;
 
+    // CUSTOM (James): Hearthstone (spell 8690) cast time halved, 10s -> 5s.
+    // Looks up whichever SpellCastTimes.dbc row is exactly 5000 ms so no index is hardcoded.
+    ApplySpellFix({ 8690 }, [](SpellInfo* spellInfo)
+    {
+        for (uint32 i = 0; i < sSpellCastTimesStore.GetNumRows(); ++i)
+        {
+            if (SpellCastTimesEntry const* castTime = sSpellCastTimesStore.LookupEntry(i))
+            {
+                if (castTime->CastTime == 5000)
+                {
+                    spellInfo->CastTimeEntry = castTime;
+                    break;
+                }
+            }
+        }
+    });
+
     LOG_INFO("server.loading", ">> Loading spell dbc data corrections  in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
