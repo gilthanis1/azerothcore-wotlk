@@ -768,16 +768,27 @@ inline int32 CraftSkillGainChance(uint32 skillValue, uint32 grayLevel, uint32 ye
     if (grayLevel <= yellowLevel)
         return skillValue < grayLevel ? orangeChance : grayChance;
 
-    if (skillValue <= yellowLevel)
-        return orangeChance;
+    // CUSTOM (James): crafting uses the four config tiers again (SkillChance.Orange / Yellow / Green / Grey)
+    // instead of sliding linearly from Orange to Grey. Green starts at the midpoint between the yellow and
+    // gray thresholds, the same point where the client colors the recipe green.
+    // Original code:
+    // if (skillValue <= yellowLevel)
+    //     return orangeChance;
+    // if (skillValue >= grayLevel)
+    //     return grayChance;
+    // // Crafting skill-up chance falls linearly from orange at the yellow
+    // // threshold to gray at the gray threshold. The green threshold is the
+    // // midpoint of that range and therefore has a 50% chance by default.
+    // return grayChance + int32(int64(grayLevel - skillValue) * (orangeChance - grayChance) /
+    //     (grayLevel - yellowLevel));
+    uint32 greenLevel = (yellowLevel + grayLevel) / 2;
     if (skillValue >= grayLevel)
         return grayChance;
-
-    // Crafting skill-up chance falls linearly from orange at the yellow
-    // threshold to gray at the gray threshold. The green threshold is the
-    // midpoint of that range and therefore has a 50% chance by default.
-    return grayChance + int32(int64(grayLevel - skillValue) * (orangeChance - grayChance) /
-        (grayLevel - yellowLevel));
+    if (skillValue >= greenLevel)
+        return sWorld->getIntConfig(CONFIG_SKILL_CHANCE_GREEN) * 10;
+    if (skillValue >= yellowLevel)
+        return sWorld->getIntConfig(CONFIG_SKILL_CHANCE_YELLOW) * 10;
+    return orangeChance;
 }
 
 bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue,
